@@ -153,10 +153,11 @@ export default function Tutors() {
                                                 )}
                                                 <div style={{ flex: 1 }}>
                                                     <div style={{ fontWeight: 700, fontSize: 16, color: '#0F172A' }}>{tutor.userId?.name}</div>
-                                                    <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
-                                                        <span className="badge badge-green">✓ Verified</span>
-                                                        <div className="stars" style={{ fontSize: 12 }}>★★★★★</div>
-                                                    </div>
+                                                    {tutor.isVerified && (
+                                                        <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+                                                            <span className="badge badge-green">✓ Verified</span>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
 
@@ -170,8 +171,7 @@ export default function Tutors() {
                                                     <span>{tutor.area}</span>
                                                 </div>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#475569' }}>
-                                                    <IndianRupee size={14} color="#F59E0B" />
-                                                    <span style={{ fontWeight: 700, color: '#059669' }}>{tutor.pricing}/month</span>
+                                                    <span style={{ fontWeight: 700, color: '#059669' }}>{tutor.pricing}</span>
                                                     <span style={{ marginLeft: 'auto', fontSize: 12, color: '#64748B' }}>Exp: {tutor.experience}</span>
                                                 </div>
                                             </div>

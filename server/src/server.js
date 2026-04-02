@@ -13,7 +13,9 @@ import authRoutes from './routes/auth.routes.js';
 import tutorRoutes from './routes/tutor.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import requirementRoutes from './routes/requirement.routes.js';
+import walletRoutes from './routes/wallet.routes.js';
 import { errorHandler } from './middleware/error.middleware.js';
+import AppError from './utils/AppError.js';
 
 dotenv.config();
 
@@ -36,8 +38,14 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tutor', tutorRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/requirement', requirementRoutes);
+app.use('/api/wallet', walletRoutes);
 
-// Error Handler
+// Handle unhandled routes (404)
+app.use((req, res, next) => {
+    next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
+
+// Global Error Handler
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;

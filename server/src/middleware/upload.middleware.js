@@ -2,16 +2,18 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 
-const uploadDir = 'uploads/profiles';
+const dirs = ['uploads/profiles', 'uploads/proofs', 'uploads/videos'];
 
-// Ensure dir exists
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
+// Ensure dirs exist
+dirs.forEach(dir => {
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+});
 
 const storage = multer.diskStorage({
     destination(req, file, cb) {
-        cb(null, uploadDir);
+        if (file.mimetype.startsWith('video/')) return cb(null, 'uploads/videos');
+        if (req.originalUrl.includes('/proof')) return cb(null, 'uploads/proofs');
+        cb(null, 'uploads/profiles');
     },
     filename(req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -19,22 +21,20 @@ const storage = multer.diskStorage({
     }
 });
 
-const checkFileType = (file, cb) => {
-    const filetypes = /jpg|jpeg|png|webp/;
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = filetypes.test(file.mimetype);
-
-    if (extname && mimetype) {
-        return cb(null, true);
-    } else {
-        cb(new Error('Images only (jpg, jpeg, png, webp)!'));
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('video/')) {
+        const filetypes = /mp4|webm|mov/;
+        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+        return extname ? cb(null, true) : cb(new Error('Only MP4, WEBM, MOV allowed!'));
     }
+
+    const filetypes = /jpg|jpeg|png|webp|pdf/;
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    return extname ? cb(null, true) : cb(new Error('Only Images or PDFs allowed!'));
 };
 
 export const upload = multer({
     storage,
-    fileFilter: function (req, file, cb) {
-        checkFileType(file, cb);
-    },
-    limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+    fileFilter,
+    limits: { fileSize: 30 * 1024 * 1024 } // 30MB limit for videos and proofs
 });

@@ -1,94 +1,61 @@
-# TutorsPoint System Architecture & Workflow Overview
+# TutorsPoint System Architecture & Workflow Overview (2026)
 
-This document provides a high-level overview of how the **TutorsPoint** platform works, its technology stack, and its core data workflows.
+This document provides a high-level overview of the **TutorsPoint** platform, its technology stack, and its core business logic.
 
-## 1. Technology Stack (MERN)
+## 1. Core Goal
+TutorsPoint is a hyper-local tuition marketplace for Kolkata. It connects parents looking for home tutors with qualified educators through a **Credit-Based Lead System**, eliminating the need for expensive OTP gateways by using algorithmic trust.
 
-The application is built using the **MERN** stack (MongoDB, Express, React, Node.js). 
-It is divided into two separate directories: `/client` (Frontend) and `/server` (Backend).
+## 2. Technology Stack (MERN)
+* **Frontend:** React 19 (Vite), Tailwind CSS (Utility), Lucide (Icons), Axios (API calls).
+* **Backend:** Node.js (Express), MongoDB (Mongoose), JWT (Authentication), Multer (Image uploads).
 
-### **Frontend (`/client`)**
-* **Framework:** React 19 powered by Vite for fast development and building.
-* **Styling:** Tailwind CSS (`v4`) for utility-first styling, paired with custom CSS in `index.css` for gradients, glassmorphism UI components, and animations.
-* **Routing:** `react-router-dom` for client-side Single Page Application (SPA) navigation.
-* **State Management:** React Context API (`AuthContext`) is used for global state management (handling active user sessions, login/logout, and roles). Local state is managed via React hooks (`useState`, `useEffect`).
-* **Icons:** `lucide-react` for standard UI iconography.
-* **HTTP Client:** `axios` (configured in `src/services/api.js`) is used to make API calls to the Express backend.
+## 3. Key Business Systems
 
-### **Backend (`/server`)**
-* **Environment:** Node.js.
-* **Framework:** Express.js for building the RESTful API routing and handling requests.
-* **Database:** MongoDB with **Mongoose** as the Object Data Modeling (ORM) library (`/models`).
-* **Authentication:** JSON Web Tokens (JWT) for stateless authentication.
-* **Architecture:** MVC (Model-View-Controller) structure:
-  * **Routes (`/routes`)**: Define the API endpoints (e.g., auth, requirements, tutors, admins).
-  * **Controllers (`/controllers`)**: Handle the business logic and database interactions for the routes.
-  * **Middleware (`/middleware`)**: Handles route protection (checking JWTs, verifying user roles) and file uploads.
-  * **Models (`/models`)**: Define the MongoDB schemas (User, Requirement, etc.).
+### **A. Monetization: Wallet & Credit System**
+* **Currency:** 1 Credit = ₹1.
+* **Flow:** Tutors spend credits to "Unlock" parent contact details.
+* **Lead Barriers:** 
+    *   Class 1-5: 10 Credits
+    *   Class 6-10: 25 Credits
+    *   Class 11-12 / JEE: 50 Credits
+* **Escrow:** High-value leads stay "Locked" for 15 minutes for Pro Users only, creating a competitive advantage.
 
----
+### **B. Fraud Protection: Trust Scoring**
+* **Verification:** Tutors aim for 100% "Profile Strength".
+* **Components:** Basic Info (50%), ID Proof (+25%), Intro Video (+25%).
+* **Velocity Lock:** Tutors who unlock >3 leads in 1 hour are automatically suspended for review.
+* **Auto-Lock:** Changing "Critical Fields" (College, Area, Subjects) after 10 days of signup triggers an automatic status regression to `PENDING` and alerts the Admin.
 
-## 2. Core Entities & Roles
-
-The system is built around three primary user roles:
-1. **Parent/Student**: Can post tuition requirements, browse tutor profiles, and receive applications.
-2. **Tutor**: Can browse the requirements board, apply to active tuition jobs, and manage their public profile.
-3. **Admin**: Has overarching access to moderate users, requirements, and platform settings.
-
----
-
-## 3. How the System Works (Data Flow)
-
-### **A. Authentication & Identity Flow**
-1. A user visits the platform and signs up (Tutor or Student/Parent).
-2. The React frontend sends a POST request to `/api/auth/signup`.
-3. The Express backend hashes the password, saves the user to MongoDB, and returns a **JWT token**.
-4. The frontend's `AuthContext` stores the token (usually in `localStorage` or memory) and keeps the user logged in across page reloads.
-5. All protected API requests include this JWT token in the `Authorization` header. The backend's `auth.middleware.js` verifies this token before allowing the action.
-
-### **B. Posting & Viewing Requirements Flow**
-1. **Posting**: A logged-in Parent/Student fills out the Post Requirement form (budget, subjects, location, days per week).
-2. **Database**: The backend controller validates this data and saves a `Requirement` document to MongoDB.
-3. **Browsing**: Tutors go to the `/requirements` page. The frontend makes a GET request to fetch all active requirements. 
-4. **UI**: Requirements are displayed using the `RequirementCard` component. Unregistered or Parent users see a masked contact number (e.g., `98XXXXXX10`).
-
-### **C. Applying to a Tuition Job (The Core Interaction)**
-1. A Tutor clicks **"Apply Now"** on a `RequirementDetails` page or `RequirementCard`.
-2. The frontend triggers the `handleApply` function, doing a POST request to `/requirement/:id/apply`.
-3. The backend checks if the user is a Tutor and hasn't already applied.
-4. If valid, the backend adds the Tutor's User ID to the requirement's `appliedTutors` array in the database.
-5. **Contact Revelation**: Once the application is successful, the backend returns the full, unmasked phone number of the Parent/Student to the Tutor, which the frontend immediately updates in the UI. 
-6. Both the Tutor and Student can now see each other in their respective dashboards (`TutorDashboard`, "My Requirements").
-
-### **D. Global UI Layout**
-* **Navbar (`Navbar.jsx`)**: Sticky header containing navigation links, responsive mobile drawer (hamburger menu), user avatar dropdown, and a notification bell. It adapts dynamically based on the user's role (showing different dropdown options for Tutors vs. Parents).
-* **Footer (`Footer.jsx`)**: 4-column responsive grid providing quick links, support, contact info, and copyright logic.
-
----
+### **C. Admin Cockpit**
+* **Command Center:** Specialized UI for reviewing pending tutors. 
+* **Audit Trail:** Every profile edit is logged. Admins see "Old Value ➔ New Value" diffs to detect "bait-and-switch" fraud.
+* **Review Checklist:** Mandatory manual human verification steps before "Approve" is clickable.
 
 ## 4. Directory Structure Map
 
 ```text
-c:\ROAD TO !L\tutorsite\
-├── client\                  # Frontend React App
-│   ├── index.html           # HTML Entry Point
-│   ├── package.json         # Frontend dependencies (React, Vite, Tailwind)
-│   ├── vite.config.js       # Vite bundler config
-│   └── src\
-│       ├── App.jsx          # Main React Router component mapping
-│       ├── index.css        # Global CSS, Tailwind imports, variables
-│       ├── context\         # AuthContext (Global state)
-│       ├── components\      # Reusable UI (Navbar.jsx, Footer.jsx, Cards)
-│       ├── pages\           # Full page components (Home, Login, Details)
-│       └── services\        # Backend communication (api.js, axios setup)
+tutorsite/
+├── client/                  # Frontend React App
+│   └── src/
+│       ├── context/        # Auth & Global State
+│       ├── services/       # Axios API config
+│       ├── pages/          # Full Page Components
+│       │   ├── admin/      # Admin specialized tabs & cockpits
+│       │   ├── tutor/      # Tutor specific management pages
+│       │   └── ...         # Public landing, search, details
+│       ├── components/     # Reusable UI Elements (Cards, Nav, Footer)
+│       └── App.jsx         # Router & Entry Point
 │
-├── server\                  # Backend Node.js/Express App
-│   ├── package.json         # Backend dependencies (Express, Mongoose, JWT)
-│   └── src\
-│       ├── server.js        # Express app initialization, DB connection
-│       ├── config\          # Environment variables, DB setup
-│       ├── routes\          # API endpoint declarations
-│       ├── controllers\     # API logic handlers
-│       ├── middleware\      # Auth guards, Error handling
-│       └── models\          # MongoDB Schemas (User, Requirement)
+└── server/                  # Backend Express App
+    └── src/
+        ├── models/         # Mongoose Schemas (User, Tutor, Requirement, Ledger)
+        ├── controllers/    # Business Logic (Lead unlocking, Credit logic)
+        ├── routes/         # API Endpoint definitions
+        ├── middleware/     # Role-based access (requireApprovedTutor)
+        └── server.js       # Entry point
 ```
+
+## 5. How to Contribute
+1. **Frontend:** Look at `src/pages/TutorDashboard.jsx` or `src/pages/EditProfile.jsx` to see how we handle profile states.
+2. **Backend:** Check `src/controllers/tutor.controller.js` to understand how `calculateCompleteness()` and `criticalFieldLock` work.
+3. **Database:** Review `src/models/Tutor.js` to see the schema fields.

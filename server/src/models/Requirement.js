@@ -51,7 +51,13 @@ const requirementSchema = new mongoose.Schema({
     views: { type: Number, default: 0 },
     appliedTutors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 
-    status: { type: String, enum: ['open', 'matched', 'closed'], default: 'open' }
+    // Revenue & Intelligence
+    unlockedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tutor' }],
+    maxUnlocks: { type: Number, default: 5 },
+    costToUnlock: { type: Number, default: 10 },
+    isLocked: { type: Boolean, default: false },
+
+    status: { type: String, enum: ['open', 'matched', 'closed', 'spam'], default: 'open' }
 }, { timestamps: true });
 
 export default mongoose.model('Requirement', requirementSchema);

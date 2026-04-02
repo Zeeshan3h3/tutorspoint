@@ -51,7 +51,7 @@ export default function Footer() {
                         <h3 style={{ color: '#fff', fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Platform</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                             {['Home', 'Find Tutors', 'Post a Requirement', 'How It Works', 'Pricing', 'Blog'].map(link => (
-                                <Link key={link} to={link === 'Home' ? '/' : '#'} style={{ color: '#CBD5E1', fontSize: 14, textDecoration: 'none', transition: 'color 0.2s' }}
+                                <Link key={link} to={link === 'Home' ? '/' : link === 'How It Works' ? '/how-it-works' : '#'} style={{ color: '#CBD5E1', fontSize: 14, textDecoration: 'none', transition: 'color 0.2s' }}
                                     onMouseEnter={e => e.target.style.color = '#fff'}
                                     onMouseLeave={e => e.target.style.color = '#CBD5E1'}>
                                     {link}
@@ -64,11 +64,16 @@ export default function Footer() {
                     <div>
                         <h3 style={{ color: '#fff', fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Support</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                            {['Help Center', 'FAQs', 'Contact Us', 'Report a Problem', 'Safety Guidelines', 'Terms of Service', 'Privacy Policy'].map(link => (
-                                <Link key={link} to="#" style={{ color: '#CBD5E1', fontSize: 14, textDecoration: 'none', transition: 'color 0.2s' }}
+                            {[
+                                { name: 'Help Center & FAQs', path: '/help' },
+                                { name: 'Contact Us & Report', path: '/contact' },
+                                { name: 'Safety Guidelines', path: '/safety' },
+                                { name: 'Terms & Privacy Policy', path: '/terms' }
+                            ].map(link => (
+                                <Link key={link.name} to={link.path} style={{ color: '#CBD5E1', fontSize: 14, textDecoration: 'none', transition: 'color 0.2s' }}
                                     onMouseEnter={e => e.target.style.color = '#fff'}
                                     onMouseLeave={e => e.target.style.color = '#CBD5E1'}>
-                                    {link}
+                                    {link.name}
                                 </Link>
                             ))}
                         </div>
@@ -84,13 +89,13 @@ export default function Footer() {
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                 <Phone size={18} color="#94A3B8" />
-                                <span style={{ fontSize: 14, color: '#CBD5E1' }}>+91 98300 XXXXX</span>
+                                <span style={{ fontSize: 14, color: '#CBD5E1' }}>+91 9088260058</span>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                 <Mail size={18} color="#94A3B8" />
-                                <a href="mailto:support@tutorspoint.in" style={{ fontSize: 14, color: '#CBD5E1', textDecoration: 'none' }}
+                                <a href="mailto:mdzeeshan08886@gmail.com" style={{ fontSize: 14, color: '#CBD5E1', textDecoration: 'none' }}
                                     onMouseEnter={e => e.target.style.color = '#fff'} onMouseLeave={e => e.target.style.color = '#CBD5E1'}>
-                                    support@tutorspoint.in
+                                    mdzeeshan08886@gmail.com
                                 </a>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>

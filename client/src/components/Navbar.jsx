@@ -1,7 +1,7 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect, useRef } from 'react';
-import { GraduationCap, LogOut, Menu, X, ChevronDown, MapPin, Mail, Bell, User, FileText, Settings, Bookmark } from 'lucide-react';
+import { GraduationCap, LogOut, Menu, X, ChevronDown, MapPin, Mail, Bell, User, FileText, Settings, Bookmark, Wallet } from 'lucide-react';
 
 export default function Navbar() {
     const { user, logout } = useAuth();
@@ -44,7 +44,7 @@ export default function Navbar() {
         { to: '/requirements', label: 'Requirements' },
         { to: '/tutors', label: 'Find Tutors' },
         { to: '/post-requirement', label: 'Post Requirement' },
-        { to: '#', label: 'How It Works' },
+        { to: '/how-it-works', label: 'How It Works' },
         { to: '#', label: 'Blog' },
     ];
 
@@ -57,9 +57,9 @@ export default function Navbar() {
                         <MapPin size={12} /> Serving Kolkata & nearby areas
                     </div>
                     <div className="hidden md:flex" style={{ display: 'flex', alignItems: 'center', gap: 16, fontWeight: 300 }}>
-                        <span>+91 98300 XXXXX</span>
-                        <a href="mailto:support@tutorspoint.in" style={{ color: '#fff', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <Mail size={12} /> support@tutorspoint.in
+                        <span>+91 9088260058</span>
+                        <a href="mailto:mdzeeshan08886@gmail.com" style={{ color: '#fff', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <Mail size={12} /> mdzeeshan08886@gmail.com
                         </a>
                     </div>
                 </div>
@@ -139,9 +139,15 @@ export default function Navbar() {
                                                 </div>
                                             </div>
 
-                                            <Link to={user.role === 'tutor' ? "/tutor-dashboard" : "/admin"} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', fontSize: 14, color: '#334155', textDecoration: 'none', transition: 'background 0.2s' }} onMouseEnter={e => e.target.style.background = '#F8FAFC'} onMouseLeave={e => e.target.style.background = 'transparent'}>
+                                            <Link to={user.role === 'tutor' ? "/tutor-dashboard" : user.role === 'admin' ? "/admin" : "/requirements"} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', fontSize: 14, color: '#334155', textDecoration: 'none', transition: 'background 0.2s' }} onMouseEnter={e => e.target.style.background = '#F8FAFC'} onMouseLeave={e => e.target.style.background = 'transparent'}>
                                                 <User size={16} color="#64748B" /> My Profile
                                             </Link>
+
+                                            {user.role === 'tutor' && (
+                                                <Link to="/wallet" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', fontSize: 14, color: '#334155', textDecoration: 'none', transition: 'background 0.2s' }} onMouseEnter={e => e.target.style.background = '#F8FAFC'} onMouseLeave={e => e.target.style.background = 'transparent'}>
+                                                    <Wallet size={16} color="#64748B" /> My Wallet
+                                                </Link>
+                                            )}
 
                                             {user.role === 'parent' || user.role === 'student' ? (
                                                 <Link to="/requirements" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', fontSize: 14, color: '#334155', textDecoration: 'none', transition: 'background 0.2s' }} onMouseEnter={e => e.target.style.background = '#F8FAFC'} onMouseLeave={e => e.target.style.background = 'transparent'}>
@@ -225,9 +231,15 @@ export default function Navbar() {
                             </div>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                                <Link to={user.role === 'tutor' ? "/tutor-dashboard" : "/admin"} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 15, color: '#334155', textDecoration: 'none', padding: '10px 0' }}>
+                                <Link to={user.role === 'tutor' ? "/tutor-dashboard" : user.role === 'admin' ? "/admin" : "/requirements"} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 15, color: '#334155', textDecoration: 'none', padding: '10px 0' }}>
                                     <User size={18} color="#64748B" /> My Profile
                                 </Link>
+
+                                {user.role === 'tutor' && (
+                                    <Link to="/wallet" style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 15, color: '#334155', textDecoration: 'none', padding: '10px 0' }}>
+                                        <Wallet size={18} color="#64748B" /> My Wallet
+                                    </Link>
+                                )}
                                 <button onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 15, color: '#DC2626', background: 'none', border: 'none', padding: '10px 0', cursor: 'pointer', textAlign: 'left', width: '100%' }}>
                                     <LogOut size={18} color="#DC2626" /> Logout
                                 </button>

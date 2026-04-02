@@ -7,24 +7,15 @@ const TRUST_ITEMS = [
     { icon: Zap, label: 'No Commission', desc: 'Contact directly, zero fees', color: '#4F46E5', bg: '#EEF2FF' },
     { icon: MapPin, label: 'Local Experts', desc: 'Tutors in your neighborhood', color: '#10B981', bg: '#ECFDF5' },
     { icon: Clock, label: '2hr Response', desc: 'Fast tutor matching', color: '#F59E0B', bg: '#FFFBEB' },
-    { icon: Users, label: '500+ Parents', desc: 'Trust us across Kolkata', color: '#8B5CF6', bg: '#F5F3FF' },
+    { icon: Users, label: 'Community', desc: 'Trust us across Kolkata', color: '#8B5CF6', bg: '#F5F3FF' },
     { icon: Award, label: 'Free Demo', desc: 'First class at no cost', color: '#06B6D4', bg: '#ECFEFF' },
 ];
 
-const TESTIMONIALS = [
-    { name: 'Priya Sharma', role: 'Parent of Class 10 student', area: 'Salt Lake', text: 'Found an excellent math tutor for my daughter in just 2 days! She went from a 60% to 88% in her boards.', rating: 5, initial: 'P', color: '#2563EB' },
-    { name: 'Rajan Mukherjee', role: 'Parent of Class 8 student', area: 'New Town', text: 'The science tutor they matched us with is excellent. My son actually enjoys studying now. Highly recommend!', rating: 5, initial: 'R', color: '#10B981' },
-    { name: 'Sujata Dey', role: 'Parent of Class 12 student', area: 'Dum Dum', text: 'Very professional service. The tutor arrived on time and was well-prepared. Board exam results were great.', rating: 5, initial: 'S', color: '#8B5CF6' },
-];
+// Removed TESTIMONIALS array due to placeholder data
 
 const AREAS = ['Salt Lake', 'New Town', 'Dum Dum', 'Behala', 'Tollygunge', 'Gariahat', 'Ballygunge', 'Park Street', 'Howrah', 'Barasat', 'Topsia', 'Tiljala', 'Science City'];
 
-const STATS = [
-    { value: '500+', label: 'Happy Parents' },
-    { value: '100+', label: 'Verified Tutors' },
-    { value: '2 hrs', label: 'Avg Response' },
-    { value: '15+', label: 'Subjects' },
-];
+// Removed STATS array due to static numbers
 
 export default function Home() {
     const [subject, setSubject] = useState('');
@@ -110,39 +101,12 @@ export default function Home() {
                             }}>
                                 <div style={{ fontSize: 120 }}>👩‍🏫</div>
 
-                                {/* Floating stat badges */}
-                                {[
-                                    { style: { top: '8%', right: '-10%' }, text: '⭐ 4.9/5 Rating', bg: '#fff' },
-                                    { style: { bottom: '15%', left: '-12%' }, text: '✓ 100% Verified', bg: '#ECFDF5' },
-                                    { style: { top: '40%', right: '-15%' }, text: '🎓 500+ Students', bg: '#EFF6FF' },
-                                ].map((b, i) => (
-                                    <div key={i} className="glass" style={{
-                                        position: 'absolute',
-                                        padding: '10px 16px',
-                                        borderRadius: 12,
-                                        fontSize: 13,
-                                        fontWeight: 700,
-                                        background: b.bg,
-                                        boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
-                                        whiteSpace: 'nowrap',
-                                        ...b.style
-                                    }}>
-                                        {b.text}
-                                    </div>
-                                ))}
+                                {/* Floating stat badges removed */}
                             </div>
                         </div>
                     </div>
 
-                    {/* Stats bar */}
-                    <div className="glass" style={{ borderRadius: 20, padding: '24px 40px', marginTop: 60, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24 }}>
-                        {STATS.map(s => (
-                            <div key={s.label} style={{ textAlign: 'center' }}>
-                                <div style={{ fontFamily: 'Poppins', fontWeight: 800, fontSize: 32, background: 'linear-gradient(135deg,#2563EB,#4F46E5)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{s.value}</div>
-                                <div style={{ fontSize: 13, color: '#64748B', fontWeight: 500, marginTop: 4 }}>{s.label}</div>
-                            </div>
-                        ))}
-                    </div>
+                    {/* Stats bar removed */}
                 </div>
             </section>
 
@@ -226,44 +190,7 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* ── TESTIMONIALS ── */}
-            <section style={{ padding: '96px 24px', background: '#fff' }}>
-                <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-                    <div className="section-header">
-                        <div className="section-label">Parent Reviews</div>
-                        <h2 className="section-title">Families Love TutorsPoint</h2>
-                        <p className="section-subtitle">Real stories from parents across Kolkata who found the perfect tutor.</p>
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
-                        {TESTIMONIALS.map((t) => (
-                            <div key={t.name} className="card" style={{ padding: 28 }}>
-                                <div className="stars" style={{ marginBottom: 12, fontSize: 18 }}>
-                                    {'★'.repeat(t.rating)}
-                                </div>
-                                <p style={{ fontSize: 15, color: '#374151', lineHeight: 1.7, marginBottom: 20, fontStyle: 'italic' }}>
-                                    "{t.text}"
-                                </p>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                    <div style={{
-                                        width: 44, height: 44, borderRadius: '50%',
-                                        background: t.color, color: '#fff',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        fontWeight: 700, fontSize: 18
-                                    }}>
-                                        {t.initial}
-                                    </div>
-                                    <div>
-                                        <div style={{ fontWeight: 700, fontSize: 14, color: '#0F172A' }}>{t.name}</div>
-                                        <div style={{ fontSize: 12, color: '#64748B' }}>{t.role} · {t.area}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* ── LOCAL AREAS ── */}
+            {/* ── TESTIMONIALS REMOVED ── */}            {/* ── LOCAL AREAS ── */}
             <section style={{ padding: '80px 24px', background: 'linear-gradient(135deg, #F8FAFC, #EFF6FF)' }}>
                 <div style={{ maxWidth: 1200, margin: '0 auto', textAlign: 'center' }}>
                     <div className="section-label">Coverage</div>
@@ -334,7 +261,7 @@ export default function Home() {
             </footer>
 
             {/* ── WHATSAPP FLOAT ── */}
-            <a href="https://wa.me/919800000000?text=Hi%20TutorsPoint%2C%20I%20need%20a%20tutor" target="_blank" rel="noopener noreferrer" className="whatsapp-float">
+            <a href="https://wa.me/919088260058?text=Hi%20TutorsPoint%2C%20I%20need%20a%20tutor" target="_blank" rel="noopener noreferrer" className="whatsapp-float">
                 <span style={{ fontSize: 22 }}>💬</span>
                 Chat with us
             </a>

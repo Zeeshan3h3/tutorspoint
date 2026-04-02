@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { MapPin, BookOpen, Monitor, Home, User, Eye, Clock, IndianRupee, ChevronRight, Loader2, Lock, UserCheck, BadgeCheck } from 'lucide-react';
+import { MapPin, BookOpen, Monitor, Home, User, Eye, Clock, IndianRupee, ChevronRight, Loader2, Lock, UserCheck, BadgeCheck, Coins, HelpCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -25,10 +25,39 @@ export default function RequirementCard({ req, onApplied }) {
 
     // Fallbacks if data is missing
     const appliedTutors = req.appliedTutors || [];
-    // Only check user id if user exists. We need to handle string IDs.
+    // Only check user id if user exists
     const hasApplied = user && appliedTutors.some(id => id === user._id || id === user.id);
     const [applied, setApplied] = useState(hasApplied);
-    const [phone, setPhone] = useState(req.phone || '98XXXXXX10');
+    const [phone, setPhone] = useState(req.phone || 'Phone hidden');
+
+    // Scarcity & Locking Logic
+    const slotsLeft = Math.max(0, (req.maxUnlocks || 5) - (req.unlockedBy?.length || 0));
+    const isFull = req.isLocked || slotsLeft === 0;
+
+    // Escrow Timer
+    const [timeLeft, setTimeLeft] = useState(req.escrowRemainingMs || 0);
+
+    useEffect(() => {
+        if (!req.isEscrowed) return;
+        const interval = setInterval(() => {
+            setTimeLeft(prev => {
+                if (prev <= 1000) {
+                    clearInterval(interval);
+                    return 0; // Unlock mechanically on the front-end when it hits 0
+                }
+                return prev - 1000;
+            });
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [req.isEscrowed]);
+
+    const formatTime = (ms) => {
+        const mins = Math.floor(ms / 60000);
+        const secs = Math.floor((ms % 60000) / 1000);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
+
+    const isCurrentlyEscrowed = req.isEscrowed && timeLeft > 0;
 
     // Only tutors can apply. Users have roles in our DB. Let's assume role is tutor.
     // If not tutor, we can disable or hide. We'll show apply to everyone, but block on click.
@@ -60,7 +89,7 @@ export default function RequirementCard({ req, onApplied }) {
     };
 
     return (
-        <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9', transition: 'all 0.2s', ':hover': { transform: 'translateY(-2px)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' } }}>
+        <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9', transition: 'all 0.2s', filter: isFull ? 'grayscale(1)' : 'none', opacity: isFull ? 0.8 : 1, ':hover': { transform: 'translateY(-2px)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' } }}>
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyItems: 'space-between', gap: 12, marginBottom: 16 }}>
                 <div style={{ display: 'flex', flex: 1, gap: 12 }}>
@@ -143,10 +172,15 @@ export default function RequirementCard({ req, onApplied }) {
             </div>
 
             {/* Footer Stats */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 11, color: '#94A3B8', marginBottom: 16, borderTop: '1px solid #F1F5F9', paddingTop: 16 }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Eye size={12} /> {req.views || 0} views</span>
-                <span>•</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><User size={12} /> {appliedTutors.length} applied</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, color: '#64748B', marginBottom: 16, borderTop: '1px solid #F1F5F9', paddingTop: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#F8FAFC', padding: '4px 10px', borderRadius: 8, fontWeight: 700, color: '#0F172A', border: '1px solid #E2E8F0' }}>
+                        <Coins size={14} color="#F59E0B" /> {req.costToUnlock || 10} Credits
+                    </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600, color: isFull ? '#DC2626' : (slotsLeft <= 2 ? '#F59E0B' : '#10B981') }}>
+                    <User size={14} /> {slotsLeft} {slotsLeft === 1 ? 'Slot' : 'Slots'} Left
+                </div>
             </div>
 
             {/* CTAs */}
@@ -157,11 +191,19 @@ export default function RequirementCard({ req, onApplied }) {
 
                 {!user ? (
                     <button onClick={() => navigate('/login?redirect=/requirements&message=Please+login+to+continue')} style={{ flex: 1, padding: '10px', borderRadius: 10, background: 'linear-gradient(135deg, #2563EB, #4F46E5)', border: 'none', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-                        Apply Now
+                        Unlock Lead
                     </button>
                 ) : isTutor ? (
-                    <button onClick={handleApply} disabled={applying || applied} style={{ flex: 1, padding: '10px', borderRadius: 10, background: applied ? '#DCFCE7' : 'linear-gradient(135deg, #2563EB, #4F46E5)', border: applied ? '2px solid #BBF7D0' : 'none', color: applied ? '#15803D' : '#fff', fontSize: 13, fontWeight: 700, cursor: (applying || applied) ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                        {applying ? <><Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> Applying...</> : applied ? '✓ Applied' : 'Apply Now'}
+                    <button
+                        onClick={handleApply}
+                        disabled={applying || applied || isFull || isCurrentlyEscrowed}
+                        style={{ flex: 1, padding: '10px', borderRadius: 10, background: applied ? '#DCFCE7' : isFull ? '#F1F5F9' : isCurrentlyEscrowed ? '#FFFBEB' : 'linear-gradient(135deg, #2563EB, #4F46E5)', border: applied ? '2px solid #BBF7D0' : isFull ? '1px solid #E2E8F0' : 'none', color: applied ? '#15803D' : (isFull ? '#64748B' : isCurrentlyEscrowed ? '#B45309' : '#fff'), fontSize: 13, fontWeight: 700, cursor: (applying || applied || isFull || isCurrentlyEscrowed) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                    >
+                        {applying ? <><Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> Unlocking...</>
+                            : applied ? '✓ Unlocked'
+                                : isFull ? '🔒 Lead Full'
+                                    : isCurrentlyEscrowed ? `⭐ Pro Access (${formatTime(timeLeft)})`
+                                        : `Unlock for ${req.costToUnlock || 10} Cr`}
                     </button>
                 ) : null}
             </div>

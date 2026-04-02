@@ -5,7 +5,7 @@ import {
     getRequirementById,
     applyToRequirement
 } from '../controllers/requirement.controller.js';
-import { protect, optionalAuth } from '../middleware/auth.middleware.js';
+import { protect, optionalAuth, requireApprovedTutor } from '../middleware/auth.middleware.js';
 import { requireRole } from '../middleware/role.middleware.js';
 
 const router = express.Router();
@@ -20,6 +20,6 @@ router.get('/:id', optionalAuth, getRequirementById);
 router.post('/', protect, createRequirement);
 
 // Apply to requirement — must be a tutor
-router.post('/:id/apply', protect, requireRole('tutor'), applyToRequirement);
+router.post('/:id/apply', protect, requireApprovedTutor, applyToRequirement);
 
 export default router;
